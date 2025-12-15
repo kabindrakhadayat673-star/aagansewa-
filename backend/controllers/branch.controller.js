@@ -31,3 +31,13 @@ export const getAllProvience = async (req, res) => {
     console.log(error);
   }
 };
+// delete provience
+export const deleteProvience = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query("DELETE FROM province WHERE province_id = ?", [id]);
+    res.status(200).json({ message: "Provience deleted successfully" });
+  } catch (error) {
+    console.log(error);
+  }
+};
