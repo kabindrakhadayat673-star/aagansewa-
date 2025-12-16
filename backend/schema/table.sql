@@ -15,3 +15,12 @@ CREATE TABLE branch(
     remarks VARCHAR(255) NULL,
     FOREIGN KEY (district_id) REFRENCES district(district_id)
 )
+CREATE TABLE services(
+    service_id INT AUTO_INCREMENT PRIMARY KEY,
+    service_name VARCHAR(150),
+    description varchar(255),
+    service_image varchar(255)
+    branch_id INT,
+    FOREIGN KEY (branch_id)
+      REFERENCES branch(branch_id) 
+);

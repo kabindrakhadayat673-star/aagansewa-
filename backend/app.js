@@ -2,11 +2,13 @@ import express from "express";
 import db from "./config/db.connect.js";
 import dotenv from "dotenv";
 import branchrouter from "./routes/branchroutes.js";
+import serviceRouter from "./routes/service.routes.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
 
 app.use("/api/branch",branchrouter)
+app.use("/api/service", serviceRouter)
 
 
 const PORT = process.env.PORT;
