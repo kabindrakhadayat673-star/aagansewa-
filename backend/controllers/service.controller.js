@@ -50,7 +50,7 @@ export const deleteservice = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({ message: "id required" });
     } else {
       const [service] = await db.query(
         "SELECT * FROM services WHERE service_id = ?",
@@ -65,6 +65,41 @@ export const deleteservice = async (req, res) => {
           .json({ message: "Services deleted successfully" });
       }
     }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// update service
+export const updateService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { service_name, description } = req.body;
+    // console.log(id);
+    // console.log(service_name, description);
+    if (!id) {
+      return res.ststus(404).json({ message: "id not found" });
+    }
+
+    const [result] = await db.query(
+      "SELECT  *  FROM services  WHERE service_id = ?",
+      [id]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+    const updateresult = result[0];
+    console.log(updateresult);
+
+    const updateservice_name = service_name || updateresult.service_name;
+    const updatedescription = description || updateresult.description;
+    await db.query(
+      "UPDATE services SET service_name = ?, description = ? WHERE service_id = ?",
+      [updateservice_name, updatedescription, id]
+    );
+
+    res.json({ message: "Service updated successfully" });
   } catch (error) {
     console.log(error);
   }

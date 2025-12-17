@@ -24,3 +24,11 @@ CREATE TABLE services(
     FOREIGN KEY (branch_id)
       REFERENCES branch(branch_id) 
 );
+CREATE TABLE review(
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    star INT NULL,
+    description TEXT NOT NULL,
+    branch_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
+)
