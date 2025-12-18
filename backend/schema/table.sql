@@ -32,3 +32,22 @@ CREATE TABLE review(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
 )
+CREATE TABLE staff (
+    staff_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    position VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    role ENUM('staff') NOT NULL DEFAULT 'staff',
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    service_id INT NOT NULL,
+    branch_id INT NOT NULL,
+    
+  FOREIGN KEY (service_id) REFERENCES services(service_id)
+ FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
+        
+);
+
+
