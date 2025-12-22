@@ -1,4 +1,6 @@
 import db from "../config/db.connect.js";
+import { removeImg } from "../utlis/removeimg.js";
+import { compressImg } from "../utlis/sharphandler.js";
 
 // add inquiry
 export const addInquiry = async (req, res) => {
@@ -89,6 +91,93 @@ export const getreview = async (req, res) => {
       message: "available review",
       data: allreview,
     });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// add trust_customer
+export const addTrustedCostumer = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const trusted_image = req.file;
+    console.log(name);
+    console.log(trusted_image);
+   
+
+    if (!name || !trusted_image) {
+      if (req.file) {
+        removeImg(req.file.path);
+      }
+      return res.status(400).json({ message: "Name and image are required" });
+    }
+
+    // compress and save
+
+    let imagePath = "";
+    if (req.file) {
+      const outputPath = `uploads/costumer/school-${req.file.filename}`;
+      await compressImg(req.file.path, outputPath);
+      imagePath = outputPath;
+    }
+    // const photopath = `uploads/trusted/${trusted_image.filename}`;
+    // await compressImg(trusted_image.path, imagePath);
+
+    // save to DB
+    await db.execute(
+      "INSERT INTO trusted_costumer (name, image) VALUES (?, ?)",
+      [name, imagePath]
+    );
+
+    res.status(201).json({ message: "Trusted customer added successfully" });
+  } catch (error) {
+    if (req.file) {
+      removeImg(req.file.path);
+    }
+  }
+};
+
+// get trust_customer
+export const getTrustedCustomers = async (req, res) => {
+  try {
+    // Fetch all trusted customers
+    const [customers] = await db.execute(
+      "SELECT * FROM  trusted_costumer ORDER BY created_at DESC"
+    );
+
+    if (customers.length === 0) {
+      return res.status(404).json({ message: "No trusted customers found" });
+    }
+
+    res.status(200).json({
+      message: "Trusted costumer fetched successfully",
+      trustedCustomers: customers,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// delete trust_customer
+export const deleteTrustedCustomer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "id required" });
+    } else {
+      const [customer] = await db.query(
+        "SELECT * FROM trusted_costumer WHERE costumer_id = ?",
+        [id]
+      );
+      if (customer.length === 0) {
+        return res.status(400).json({ message: "customer not found" });
+      } else {
+        await db.query("DELETE from trusted_costumer WHERE costumer_id=?", [id]);
+        return res
+          .status(400)
+          .json({ message: "customer deleted sucessfully" });
+      }
+    }
   } catch (error) {
     console.log(error);
   }

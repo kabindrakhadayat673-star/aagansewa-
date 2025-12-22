@@ -49,5 +49,27 @@ CREATE TABLE staff (
  FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
         
 );
+CREATE TABLE gallery (
+    gallery_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    gallery_date DATE NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    branch_id INT NOT NULL,
+    image VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (branch_id)
+        REFERENCES branch(branch_id),
+     
+        
+);
+create table trusted_costumer (
+    costumer_id int AUTO_INCREMENT primary key,
+    name varchar(255) null,
+    image text
+
+);
+
+
+
 
 
