@@ -7,6 +7,7 @@ import siterouter from "./routes/siter.routes.js";
 import staffrouter from "./routes/staff.routes.js";
 
 import galleryrouter from "./routes/gallary.routes.js";
+import router from "./routes/auth.routes.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -16,6 +17,7 @@ app.use("/api/service", serviceRouter);
 app.use("/api/site", siterouter);
 app.use("/api/staff", staffrouter);
 app.use("/api/gallery", galleryrouter);
+app.use("/api/auth", router);
 
 const PORT = process.env.PORT;
 try {

@@ -1,3 +1,15 @@
+INSERT INTO users (email, password, role)
+VALUES (
+    'admin12@gmail.com',
+    '$2a$12$SEE8pOr.vKZX/cPeTpxdZuGTlGyIX3QHxpAP7ANEYzlK4XHXgaDAC', 
+    'admin'
+    
+);
+
+
+
+
+
 CREATE TABLE province (
     province_id INT AUTO_INCREMENT PRIMARY KEY,
     province_name VARCHAR(100) NOT NULL
@@ -68,6 +80,16 @@ create table trusted_costumer (
     image text
 
 );
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    role ENUM('admin', 'branch_manager') NOT NULL DEFAULT 'branch_manager',
+     branch_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
+)
 
 
 
