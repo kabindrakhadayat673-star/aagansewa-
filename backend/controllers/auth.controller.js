@@ -170,3 +170,49 @@ export const deleteManager = async (req, res) => {
     console.log(error);
   }
 };
+
+// update manager
+export const updateManager = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name,email,branch_id, } = req.body;
+
+    const [existing] = await db.execute(
+      `SELECT * FROM users WHERE user_id = ? `,
+      [id]
+    );
+    if (existing.length === 0)
+      return res.status(404).json({ message: "Manager not found" });
+    if (email) {
+      const [existEmail] = await db.execute(
+        "select email from users where email = ? and user_id !=?",
+        [email, id]
+      );
+      if (existEmail.length > 0) {
+        return res.status(409).json({
+          message: `email  already exist use diffrent email `,
+        });
+      }
+    }
+    const oldStaff = existing[0];
+
+    // Optional: Validate service and branch if provided
+ if (branch_id) {
+      const [branch] = await db.execute(
+        "SELECT * FROM branch WHERE branch_id = ?",
+        [branch_id]
+      );
+      if (branch.length === 0)
+        return res.status(404).json({ message: "Branch not found" });
+    }
+      const updateName = name || oldStaff.name;
+     const updateEmail = email || oldStaff.email;
+     const updteBranchId = branch_id || oldStaff.branch_id;
+    await db.execute(
+      "UPDATE users SET name=?, email=?,  branch_id=? WHERE user_id=?",
+      [updateName, updateEmail, updteBranchId, id]
+    ); res.status(200).json({ message: "Manager updated successfully" });
+  } catch (error) {
+    console.log(error);
+  }
+};
