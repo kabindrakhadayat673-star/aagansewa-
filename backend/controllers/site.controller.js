@@ -3,7 +3,7 @@ import { removeImg } from "../utlis/removeimg.js";
 import { compressImg } from "../utlis/sharphandler.js";
 
 // add inquiry
-export const addInquiry = async (req, res) => {
+export const addInquiry = async (req, res, next) => {
   try {
     const { name, phone, email, address, description, branch_id } = req.body;
     // console.log(name);
@@ -21,12 +21,12 @@ export const addInquiry = async (req, res) => {
     );
     return res.status(200).json({ message: "Inquiry added successfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // get inquiry
-export const getInquiry = async (req, res) => {
+export const getInquiry = async (req, res, next) => {
   try {
     const [allInquiry] = await db.query(
       `SELECT i.inquiry_id, i.name,i.phone,i.email,i.address,i.description,b.branch_id,b.branch_name FROM inquiry i LEFT JOIN branch b ON i.branch_id = b.branch_id`
@@ -36,12 +36,12 @@ export const getInquiry = async (req, res) => {
       data: allInquiry,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // delete inquiry
-export const deleteInquiry = async (req, res) => {
+export const deleteInquiry = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
@@ -59,12 +59,12 @@ export const deleteInquiry = async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 //  add review
-export const addreview = async (req, res) => {
+export const addreview = async (req, res, next) => {
   try {
     const {  star, description, branch_id, created_id } = req.body;
     if ( !star || !description || !branch_id ) {
@@ -77,12 +77,12 @@ export const addreview = async (req, res) => {
 
     res.status(400).json({ meaagae: "review add sucessfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // get review
-export const getreview = async (req, res) => {
+export const getreview = async (req, res, next) => {
   try {
     const [allreview] = await db.query(
       `SELECT r.star,r.description,b.branch_id,b.branch_name FROM review r LEFT JOIN branch b ON r.branch_id = b.branch_id `
@@ -92,12 +92,12 @@ export const getreview = async (req, res) => {
       data: allreview,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // add trust_customer
-export const addTrustedCostumer = async (req, res) => {
+export const addTrustedCostumer = async (req, res, next) => {
   try {
     const { name } = req.body;
     const trusted_image = req.file;
@@ -134,11 +134,12 @@ export const addTrustedCostumer = async (req, res) => {
     if (req.file) {
       removeImg(req.file.path);
     }
+    next(error);
   }
 };
 
 // get trust_customer
-export const getTrustedCustomers = async (req, res) => {
+export const getTrustedCustomers = async (req, res, next) => {
   try {
     // Fetch all trusted customers
     const [customers] = await db.execute(
@@ -154,12 +155,12 @@ export const getTrustedCustomers = async (req, res) => {
       trustedCustomers: customers,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // delete trust_customer
-export const deleteTrustedCustomer = async (req, res) => {
+export const deleteTrustedCustomer = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
@@ -179,6 +180,6 @@ export const deleteTrustedCustomer = async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };

@@ -1,6 +1,6 @@
 import db from "../config/db.connect.js";
 // add service
-export const addservice = async (req, res) => {
+export const addservice = async (req, res, next) => {
   try {
     const { service_name, service_description, branch_id } = req.body;
     if (!service_name || !service_description || !branch_id) {
@@ -26,12 +26,12 @@ export const addservice = async (req, res) => {
     );
     return res.status(200).json({ message: "Service added successfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // get service
-export const getservice = async (req, res) => {
+export const getservice = async (req, res, next) => {
   try {
     const [allService] = await db.query(
       `SELECT s.service_id, s.service_name,s.description,b.branch_id,b.branch_name FROM services s LEFT JOIN branch b ON s.branch_id = b.branch_id`
@@ -41,12 +41,12 @@ export const getservice = async (req, res) => {
       data: allService,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // delete service
-export const deleteservice = async (req, res) => {
+export const deleteservice = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
@@ -66,12 +66,12 @@ export const deleteservice = async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // update service
-export const updateService = async (req, res) => {
+export const updateService = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { service_name, description } = req.body;
@@ -101,6 +101,6 @@ export const updateService = async (req, res) => {
 
     res.json({ message: "Service updated successfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };

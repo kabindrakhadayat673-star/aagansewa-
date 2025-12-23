@@ -1,7 +1,7 @@
 import db from "../config/db.connect.js";
 
 // add staff
-export const addstaff = async (req, res) => {
+export const addstaff = async (req, res, next) => {
   try {
     const {
       name,
@@ -71,12 +71,12 @@ export const addstaff = async (req, res) => {
       message: "Staff added successfully",
     });
   } catch (error) {
-    console.error(error);
+    next(error);
   }
 };
 
 // get staff
-export const getstaff = async (req, res) => {
+export const getstaff = async (req, res, next) => {
   try {
     const [allstaff] = await db.query(`SELECT s.*,b.branch_id FROM staff s
      LEFT JOIN branch b ON s.branch_id = b.branch_id`);
@@ -84,12 +84,12 @@ export const getstaff = async (req, res) => {
       .status(200)
       .json({ message: "staff added sucessfully", data: allstaff });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // delete staff
-export const deletestaff = async (req, res) => {
+export const deletestaff = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
@@ -106,12 +106,12 @@ export const deletestaff = async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // update staff
-export const updateStaff = async (req, res) => {
+export const updateStaff = async (req, res, next) => {
   try {
     const { id } = req.params; // staff_id
     const {
@@ -148,12 +148,23 @@ export const updateStaff = async (req, res) => {
          service_id = ?,
          branch_id = ?
        WHERE staff_id = ?`,
-      [name, position, role, email, password, phone, description,service_id, branch_id, id]
+      [
+        name,
+        position,
+        role,
+        email,
+        password,
+        phone,
+        description,
+        service_id,
+        branch_id,
+        id,
+      ]
     );
     res.status(200).json({
       message: "Staff updated successfully",
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };

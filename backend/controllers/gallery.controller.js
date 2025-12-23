@@ -3,7 +3,7 @@ import { removeImg } from "../utlis/removeimg.js";
 import { compressImg } from "../utlis/sharphandler.js";
 
 // add gallery
-export const addgallery = async (req, res) => {
+export const addgallery = async (req, res, next) => {
   try {
     const { title, gallery_date, location, branch_id } = req.body;
     const images = req.files;
@@ -57,12 +57,12 @@ export const addgallery = async (req, res) => {
       images: imagePaths,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // get gallery
-export const getgallery = async (req, res) => {
+export const getgallery = async (req, res, next) => {
   try {
     const [galleries] = await db.execute(
       "SELECT * FROM gallery ORDER BY created_at DESC"
@@ -76,12 +76,12 @@ export const getgallery = async (req, res) => {
       galleries,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // delete gallery
-export const deletegallery = async (req, res) => {
+export const deletegallery = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -102,6 +102,6 @@ export const deletegallery = async (req, res) => {
 
     res.status(200).json({ message: "Gallery deleted successfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };

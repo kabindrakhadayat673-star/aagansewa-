@@ -2,7 +2,7 @@ import db from "../config/db.connect.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 // login
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     // validation
@@ -26,7 +26,7 @@ export const login = async (req, res) => {
 
     console.log(process.env.EXPIRE);
     // jsonwebtoken
-    const token = await jwt.sign(
+    const token =  jwt.sign(
       {
         // 1 your detalis
         id: user.id,
@@ -37,11 +37,13 @@ export const login = async (req, res) => {
       // 2.secret key
       process.env.SECRET_KEY,
 
+
       {
         // 3.Expire time
         expiresIn: process.env.EXPIRE,
       }
     );
+    // console.log(process.env.SECRET_KEY)
     // storing token to cookies
     res.cookie("token", token, {
       httpOnly: true,
@@ -62,28 +64,24 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
 // logout
-export const logout = async (req, res) => {
+export const logout = async (req, res, next) => {
   try {
     res.clearCookie("token");
     res.status(200).json({ message: "Sucessfully log out" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // manager api
 
 // add manager
-export const addManager = async (req, res) => {
+export const addManager = async (req, res, next) => {
   try {
     const { name, email, password, branch_id } = req.body;
 
@@ -95,7 +93,7 @@ export const addManager = async (req, res) => {
         .json({ message: "Please provide all required fields" });
     }
     //check the user already exist or not
-    const [exist] = await db.execute("select name from users where email= ?", [
+    const [exist] = await db.execute("select email from users where email= ?", [
       email,
     ]);
     if (exist.length > 0) {
@@ -103,16 +101,7 @@ export const addManager = async (req, res) => {
         message: `email  already exist use diffrent email `,
       });
     }
-    // Check service exists
-    const [existBranchManager] = await db.execute(
-      "SELECT * FROM users WHERE branch_id = ?",
-      [branch_id]
-    );
-    if (existBranchManager.length > 0)
-      return res
-        .status(404)
-        .json({ message: " branch manager is already exist" });
-
+   
     // Check branch exists
     const [branch] = await db.execute(
       "SELECT * FROM branch WHERE branch_id = ?",
@@ -133,12 +122,12 @@ export const addManager = async (req, res) => {
       message: `Manager  added successfully in ${branch[0].branch_name} branch`,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // get manager
-export const getManager = async (req, res) => {
+export const getManager = async (req, res, next) => {
   try {
     const [manager] = await db.execute("SELECT * FROM users");
     if (manager.length === 0)
@@ -148,12 +137,12 @@ export const getManager = async (req, res) => {
       managers: manager,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // delete manager
-export const deleteManager = async (req, res) => {
+export const deleteManager = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!id) {
@@ -167,12 +156,12 @@ export const deleteManager = async (req, res) => {
       return res.status(200).json({ message: "manager deleted successfully" });
     }
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // update manager
-export const updateManager = async (req, res) => {
+export const updateManager = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name,email,branch_id, } = req.body;
@@ -213,6 +202,6 @@ export const updateManager = async (req, res) => {
       [updateName, updateEmail, updteBranchId, id]
     ); res.status(200).json({ message: "Manager updated successfully" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
