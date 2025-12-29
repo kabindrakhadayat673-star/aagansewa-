@@ -6,6 +6,7 @@ import branchrouter from "./routes/branchroutes.js";
 import serviceRouter from "./routes/service.routes.js";
 import siterouter from "./routes/siter.routes.js";
 import staffrouter from "./routes/staff.routes.js";
+import cors from "cors";
 
 import galleryrouter from "./routes/gallary.routes.js";
 import router from "./routes/auth.routes.js";
@@ -13,6 +14,12 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:500",
+    credentials: true,
+  })
+);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/branch", branchrouter);
 app.use("/api/service", serviceRouter);
