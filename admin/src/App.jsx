@@ -1,11 +1,16 @@
 import React from "react";
-import Login from "./components/Login";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router/Index";
+import { ToastContainer } from "react-toastify";
+
+
 
 const App = () => {
   return (
-    <div>
-      <Login />
-    </div>
+<div>
+  <RouterProvider router={router} />
+  <ToastContainer />
+       </div>
   );
 };
 

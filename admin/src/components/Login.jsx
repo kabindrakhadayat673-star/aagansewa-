@@ -1,31 +1,38 @@
 import { useState } from "react";
 import Input from "./shared/input";
 import { useLoginMutation } from "../redux/features/authSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { setUser } from "../redux/features/authstate";
+import { toast } from "react-toastify";
 
 const Login = () => {
-  const [Login]= useLoginMutation();
-const [formData, setFromData]=useState({
+  const Dispatch = useDispatch();
+  const Navigate = useNavigate();
+  const [Login] = useLoginMutation();
+  const [formData, setFromData] = useState({
     email: "",
     password: "",
-    })
-    const handlClick = (e) => {
+  });
+  const handlClick = (e) => {
     const { id, value } = e.target;
     setFromData({ ...formData, [id]: value });
+  };
 
-    }
-
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-     const res = await Login(formData).unwrap();
-     console.log(res);
-     } catch (error) {
-      alert("error",error);
-      console.log(error);
-      
+      const res = await Login(formData).unwrap();
+      console.log(res);
+      Dispatch(setUser(res.user));
+      Navigate("/admin/dashboard");
+      toast.success(res.message);
+    } catch (error) {
+      toast.error(error.data.message);
     }
-  }
+  };
   
+
   return (
     <div className="h-screen flex justify-center items-center bg-gray-100">
       <div className="flex flex-col items-center bg-white p-10 rounded-xl shadow-md w-96">
@@ -42,7 +49,6 @@ const [formData, setFromData]=useState({
             required
             onChange={handlClick}
             value={formData.email}
-
           />
 
           <Input
@@ -50,8 +56,8 @@ const [formData, setFromData]=useState({
             type="password"
             placeholder="Enter the password"
             id="password"
-             required
-             onChange={handlClick}
+            required
+            onChange={handlClick}
             value={formData.password}
           />
 

@@ -15,13 +15,13 @@ const userSlice = createSlice({
       state.role = action.payload.role;
       state.isAuth = !!action.payload;
     },
-    // logout: (state) => {
-    //   state.email = "";
-    //   state.role = "";
-    //   state.isAuth = false;
-    // },
+    logout: (state) => {
+      state.email = "";
+      state.role = "";
+      state.isAuth = false;
+    },
   },
 });
 
-export const { setUser } = userSlice.actions;
+export const { setUser,logout } = userSlice.actions;
 export default userSlice.reducer;
