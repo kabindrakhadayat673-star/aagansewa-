@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "./shared/input";
 import { useLoginMutation } from "../redux/features/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../redux/features/authstate";
 import { toast } from "react-toastify";
@@ -10,10 +10,16 @@ const Login = () => {
   const Dispatch = useDispatch();
   const Navigate = useNavigate();
   const [Login] = useLoginMutation();
+  const { isAuth } = useSelector((state) => state.authstate || {});
   const [formData, setFromData] = useState({
     email: "",
     password: "",
   });
+  useEffect(() => {
+    if (isAuth){
+      Navigate("/admin/dashboard");
+    }
+  }, [isAuth, Navigate]);
   const handlClick = (e) => {
     const { id, value } = e.target;
     setFromData({ ...formData, [id]: value });

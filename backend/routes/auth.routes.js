@@ -7,7 +7,7 @@ const router = express.Router();
 
 // LOGIN ROUTE
 router.post("/auth-login", login);
-router.post("/auth-logout", isLogin, logout);
+router.post("/auth-logout", logout);
 
 // manager
 router.post("/add-manager", isLogin, authorizeRoles("admin"), addManager);
