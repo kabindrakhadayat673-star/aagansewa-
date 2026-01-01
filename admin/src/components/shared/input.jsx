@@ -1,4 +1,6 @@
-const Input = ({ label, type = "text", placeholder, id, required = false, value,onChange }) => {
+import React from 'react';
+
+const Input = ({ label, type = "text", placeholder, id, required = false, value, onChange }) => {
   return (
     <label className="flex flex-col text-left">
       <span>

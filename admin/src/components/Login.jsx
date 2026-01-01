@@ -7,31 +7,34 @@ import { setUser } from "../redux/features/authstate";
 import { toast } from "react-toastify";
 
 const Login = () => {
-  const Dispatch = useDispatch();
-  const Navigate = useNavigate();
-  const [Login] = useLoginMutation();
-  const { isAuth } = useSelector((state) => state.authstate || {});
-  const [formData, setFromData] = useState({
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [login] = useLoginMutation();
+  const { isAuth } = useSelector((state) => state.user || {});
+  const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  
   useEffect(() => {
-    if (isAuth){
-      Navigate("/admin/dashboard");
+    if (isAuth) {
+      navigate("/admin/dashboard");
     }
-  }, [isAuth, Navigate]);
-  const handlClick = (e) => {
+  }, [isAuth, navigate]);
+  
+  const handleClick = (e) => {
     const { id, value } = e.target;
-    setFromData({ ...formData, [id]: value });
+    setFormData({ ...formData, [id]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      const res = await Login(formData).unwrap();
+      const res = await login(formData).unwrap();
       console.log(res);
-      Dispatch(setUser(res.user));
-      Navigate("/admin/dashboard");
+      dispatch(setUser(res.user));
+      navigate("/admin/dashboard");
       toast.success(res.message);
     } catch (error) {
       toast.error(error.data.message);
@@ -53,7 +56,7 @@ const Login = () => {
             placeholder="Enter the email"
             id="email"
             required
-            onChange={handlClick}
+            onChange={handleClick}
             value={formData.email}
           />
 
@@ -63,7 +66,7 @@ const Login = () => {
             placeholder="Enter the password"
             id="password"
             required
-            onChange={handlClick}
+            onChange={handleClick}
             value={formData.password}
           />
 

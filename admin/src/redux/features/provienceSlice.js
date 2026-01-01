@@ -19,6 +19,15 @@ const provienceApi = indexSlice.injectEndpoints({
       invalidatesTags: ["provience"],
     }),
 
+    updateprovience: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `branch/update-provience/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["provience"],
+    }),
+
     deleteprovience: builder.mutation({
       query: (data) => ({
         url: `branch/delete-provience/${data.id}`,
@@ -31,6 +40,7 @@ const provienceApi = indexSlice.injectEndpoints({
 });
 export const {
   useAddprovienceMutation,
+  useUpdateprovienceMutation,
   useDeleteprovienceMutation,
   useGetProvienceQuery,
 } = provienceApi;
