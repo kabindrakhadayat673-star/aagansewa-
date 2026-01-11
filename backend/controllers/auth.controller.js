@@ -82,18 +82,17 @@ export const logout = async (req, res, next) => {
 // add manager
 export const addManager = async (req, res, next) => {
   try {
-    const { name, email, password, branch_id } = req.body;
+    const { manager_name, manager_email, manager_phone, password, branch_id } = req.body;
+    const image = req.file ? req.file.filename : null;
 
-    // console.log(req.body);
-
-    if (!name || !email || !password || !branch_id) {
+    if (!manager_name || !manager_email || !password || !branch_id) {
       return res
         .status(400)
         .json({ message: "Please provide all required fields" });
     }
     //check the user already exist or not
     const [exist] = await db.execute("select email from users where email= ?", [
-      email,
+      manager_email,
     ]);
     if (exist.length > 0) {
       return res.status(409).json({
@@ -112,9 +111,9 @@ export const addManager = async (req, res, next) => {
 
     await db.execute(
       `INSERT INTO users
-      (name, email, password, branch_id)
+      (email, password, role, branch_id)
       VALUES (?, ?, ?, ?)`,
-      [name, email, hashedPassword, branch_id]
+      [manager_email, hashedPassword, 'branch_manager', branch_id]
     );
 
     res.status(201).json({
@@ -128,12 +127,12 @@ export const addManager = async (req, res, next) => {
 // get manager
 export const getManager = async (req, res, next) => {
   try {
-    const [manager] = await db.execute("SELECT * FROM users");
+    const [manager] = await db.execute("SELECT * FROM users WHERE role = 'branch_manager'");
     if (manager.length === 0)
       return res.status(404).json({ message: "No manager found" });
     res.status(200).json({
       message: "Manager fetched successfully",
-      managers: manager,
+      data: manager,
     });
   } catch (error) {
     next(error);
@@ -147,13 +146,12 @@ export const deleteManager = async (req, res, next) => {
     if (!id) {
       return res.status(400).json({ message: "manager id is required" });
     }
-    const [manager] = await db.query("SELECT * from users from user_id");
+    const [manager] = await db.execute("SELECT * FROM users WHERE user_id = ?", [id]);
     if (manager.length === 0) {
-      return res.status(400).json({ messager: "manager not found" });
-    } else {
-      await db.query("DELETE FROM users WHERE user_id = ?", [id]);
-      return res.status(200).json({ message: "manager deleted successfully" });
+      return res.status(404).json({ message: "manager not found" });
     }
+    await db.execute("DELETE FROM users WHERE user_id = ?", [id]);
+    return res.status(200).json({ message: "manager deleted successfully" });
   } catch (error) {
     next(error);
   }

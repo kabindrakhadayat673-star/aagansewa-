@@ -16,6 +16,18 @@ export const branchAPIs = indexSlice.injectEndpoints({
       }),
       invalidatesTags: ["auth"],
     }),
+     getPDB: builder.query({
+      query: ({ province_id, district_id }) => {
+        const params = new URLSearchParams();
+        if (province_id) params.append('province_id', province_id);
+        if (district_id) params.append('district_id', district_id);
+        return {
+          url: `branch/getprovincedistrictbranch?${params.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["branch"],
+    }),
   }),
 });
-export const { useGetbranchQuery, useDeletebranchMutation } = branchAPIs;
+export const { useGetbranchQuery, useDeletebranchMutation,useGetPDBQuery } = branchAPIs;

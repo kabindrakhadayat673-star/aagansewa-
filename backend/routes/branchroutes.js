@@ -7,6 +7,7 @@ import {
   deleteBranch,
   deleteDistrict,
   deleteProvience,
+  getAllPDB,
   getAllProvience,
    getBranch,
   getDistrict,
@@ -30,6 +31,13 @@ branchrouter.delete("/delete-district/:id", isLogin, deleteDistrict);
 branchrouter.post("/add-branch", isLogin, addBranch);
 branchrouter.get("/get-branch", getBranch);
 branchrouter.delete("/delete-branch/:id", isLogin, deleteBranch);
+
+branchrouter.get(
+  "/getprovincedistrictbranch",
+  isLogin,
+  authorizeRoles("admin"),
+  getAllPDB
+);
 
 
 

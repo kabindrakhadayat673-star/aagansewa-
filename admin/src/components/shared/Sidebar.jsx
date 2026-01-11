@@ -9,7 +9,7 @@ import { MapPin, Building2, GitBranch, Users, LogOut, Home, User } from "lucide-
 const Sidebar = () => {
   const menuItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: Home },
-    { name: "Users", path: "/admin/users", icon: Users },
+    { name: "manager", path: "/admin/manager", icon: Users },
     { name: "Province", path: "/admin/province", icon: MapPin },
     { name: "District", path: "/admin/district", icon: Building2 },
     { name: "Branch", path: "/admin/branch", icon: GitBranch },

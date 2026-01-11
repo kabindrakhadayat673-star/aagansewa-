@@ -23,7 +23,9 @@ export const addProvience = async (req, res, next) => {
 export const getAllProvience = async (req, res, next) => {
   try {
     const [provience] = await db.query(
-      `SELECT p.province_id, p.province_name,GROUP_CONCAT(d.district_name) as district FROM province p LEFT JOIN district d ON p.province_id=d.province_id GROUP BY p.province_id, p.province_name`
+      `SELECT p.province_id, p.province_name,GROUP_CONCAT(d.district_name) as district 
+      FROM province p LEFT JOIN district d ON p.province_id=d.province_id 
+      GROUP BY p.province_id, p.province_name`
     );
 
     return res.status(200).json({
@@ -34,6 +36,7 @@ export const getAllProvience = async (req, res, next) => {
     next(error);
   }
 };
+
 // delete provience
 export const deleteProvience = async (req, res, next) => {
   try {
@@ -81,9 +84,20 @@ export const addDistrict = async (req, res, next) => {
 // get district
 export const getDistrict = async (req, res, next) => {
   try {
-    const [alldistrict] = await db.query(`SELECT * FROM district `);
-    return res.status(200).json({
-      messgae: "available diatrict",
+    const [alldistrict] = await db.query(
+      `SELECT d.district_id,
+       d.district_name, 
+       p.province_name,
+      GROUP_CONCAT(b.branch_name) as branches 
+       FROM district d 
+       LEFT JOIN province p
+      ON d.province_id = p.province_id
+      LEFT JOIN branch b 
+      ON d.district_id = b.district_id 
+      GROUP BY d.district_id, d.district_name, p.province_name`
+    );
+    return res.status(201).json({
+      message: "available district..",
       data: alldistrict,
     });
   } catch (error) {
@@ -119,7 +133,7 @@ export const deleteDistrict = async (req, res, next) => {
 // add branch
 export const addBranch = async (req, res, next) => {
   try {
-    const { branch_name, district_id, remarks} = req.body;
+    const { branch_name, district_id, remarks } = req.body;
 
     if (!branch_name | !district_id) {
       return res.status(400).json({
@@ -127,59 +141,92 @@ export const addBranch = async (req, res, next) => {
       });
     }
 
-    const [row]=await db.query ("SELECT * FROM district WHERE district_id = ?",[district_id])
+    const [row] = await db.query(
+      "SELECT * FROM district WHERE district_id = ?",
+      [district_id]
+    );
     if (row.length === 0) {
       return res.status(400).json({ message: "District not found" });
     }
     await db.query(
       "INSERT INTO branch (branch_name, district_id, remarks) VALUES (?, ?, ?)",
       [branch_name, district_id, remarks]
-       );
+    );
     return res.status(201).json({
       message: "Branch added successfully",
-     
     });
   } catch (error) {
     next(error);
   }
-  };
+};
 
-  // get branch
-  export const getBranch = async (req, res, next) => {
-    try {
-      const [allbranch] = await db.query(`SELECT * FROM branch`);
-      return res.status(200).json({
-        messgae: "available branch",
-        data: allbranch,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
+// get branch
+export const getBranch = async (req, res, next) => {
+  try {
+    const [allbranch] = await db.query(`SELECT 
+      b.branch_name,b.branch_id,b.Remark ,d.district_name ,d.district_id
+      FROM branch b 
+      LEFT JOIN district d
+      ON b.district_id=d.district_id`);
+    return res.status(200).json({
+      message: "ALL branch ",
+      data: allbranch,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-  // delete branch
-  export const deleteBranch = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      if (!id) {
-        return res.status(400).json({ message: "All fields are required" });
+// delete branch
+export const deleteBranch = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "All fields are required" });
+    } else {
+      const [branch] = await db.query(
+        "SELECT * FROM branch WHERE branch_id = ?",
+        [id]
+      );
+      if (branch.length === 0) {
+        return res.status(400).json({ message: "Branch not found" });
       } else {
-        const [branch] = await db.query(
-          "SELECT * FROM branch WHERE branch_id = ?",
-          [id]
-        );
-        if (branch.length === 0) {
-          return res.status(400).json({ message: "Branch not found" });
-        } else {
-          await db.query("DELETE FROM branch WHERE branch_id = ?", [id]);
-          return res
-            .status(200)
-            .json({ message: "Branch deleted successfully" });
-        }
+        await db.query("DELETE FROM branch WHERE branch_id = ?", [id]);
+        return res.status(200).json({ message: "Branch deleted successfully" });
       }
-    } catch (error) {
-      next(error);
     }
-  };
+  } catch (error) {
+    next(error);
+  }
+};
 
+export const getAllPDB = async (req, res, next) => {
+  const { province_id, district_id } = req.query;
 
+  try {
+    let query = "";
+    let params = [];
+
+    if (province_id && !district_id) {
+      // Get districts based on province_id
+      query = "SELECT * FROM district WHERE province_id = ?";
+      params = [province_id];
+    } else if (district_id) {
+      // Get branches based on district_id
+      query = "SELECT * FROM branch WHERE district_id = ?";
+      params = [district_id];
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Please provide province_id or district_id" });
+    }
+    const [results] = await db.query(query, params);
+
+    res.status(200).json({
+      message: "Data fetched successfully",
+      data: results,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
